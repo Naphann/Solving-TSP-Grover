@@ -1,6 +1,7 @@
 import qiskit
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import Aer
+from qiskit.circuit import Qubit
 
 import numpy as np
 from math import floor, ceil
@@ -274,7 +275,7 @@ def apply_mct(circuit, controls, target, anc, mode='clean-ancilla'):
 def _mct(self, controls, target, ancilla, mode):
     if controls is None or len(controls) < 0:
         raise ValueError('you should pass controls as list or registers')
-    if target is None or len(target) != 1:
+    if target is None or (not isinstance(target, Qubit) and len(target) != 1):
         raise ValueError('target length is not 1')
     if ancilla is None or len(ancilla) < ceil((len(controls)-2)/2):
         raise ValueError('for {} controls, need at least {} ancilla'.format(len(controls), ceil((len(controls)-2)/2)))
