@@ -1,6 +1,7 @@
 import qiskit
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import Aer
+from qiskit.circuit import Qubit
 
 import numpy as np
 from math import floor, ceil
@@ -196,69 +197,69 @@ def apply_mct_dirty(self, controls, target, ancilla):
     
     
     SRTS(self, controls[-1], anc[-1], target)
-    qc.barrier()
+    self.barrier()
     
     if (n-4)%2 == 0:
         a_idx = 1
         for i in reversed(range(floor((n-4)/2))):
             RT4S(self, anc[a_idx - 1 + i], controls[2*i+3], controls[2*i+4], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
     else:
         a_idx = 2
         for i in reversed(range(floor((n-4)/2))):
             RT4S(self, anc[a_idx - 1 + i], controls[2*i+4], controls[2*i+5], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
         RTS(self, anc[0], controls[3], anc[1])
-        qc.barrier()
+        self.barrier()
     
     RT4L(self, controls[0], controls[1], controls[2], anc[0])
-    qc.barrier()
+    self.barrier()
     
     if (n-4)%2 == 0:
         a_idx = 1
         for i in (range(floor((n-4)/2))):
             RT4S_inv(self, anc[a_idx - 1 + i], controls[2*i+3], controls[2*i+4], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
     else:
         a_idx = 2
         RTS_inv(self, anc[0], controls[3], anc[1])
-        qc.barrier()
+        self.barrier()
         for i in (range(floor((n-4)/2))):
             RT4S_inv(self, anc[a_idx - 1 + i], controls[2*i+4], controls[2*i+5], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
             
     SRTS_inv(self, controls[-1], anc[-1], target)
-    qc.barrier()
+    self.barrier()
     
     ## SAME AS ABOVE
     if (n-4)%2 == 0:
         a_idx = 1
         for i in reversed(range(floor((n-4)/2))):
             RT4S(self, anc[a_idx - 1 + i], controls[2*i+3], controls[2*i+4], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
     else:
         a_idx = 2
         for i in reversed(range(floor((n-4)/2))):
             RT4S(self, anc[a_idx - 1 + i], controls[2*i+4], controls[2*i+5], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
         RTS(self, anc[0], controls[3], anc[1])
-        qc.barrier()
+        self.barrier()
     
     RT4L_inv(self, controls[0], controls[1], controls[2], anc[0])
-    qc.barrier()
+    self.barrier()
     
     if (n-4)%2 == 0:
         a_idx = 1
         for i in (range(floor((n-4)/2))):
             RT4S_inv(self, anc[a_idx - 1 + i], controls[2*i+3], controls[2*i+4], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
     else:
         a_idx = 2
         RTS_inv(self, anc[0], controls[3], anc[1])
-        qc.barrier()
+        self.barrier()
         for i in (range(floor((n-4)/2))):
             RT4S_inv(self, anc[a_idx - 1 + i], controls[2*i+4], controls[2*i+5], anc[a_idx + i])
-            qc.barrier()
+            self.barrier()
 
 def apply_mct(circuit, controls, target, anc, mode='clean-ancilla'):
     if len(controls) == 1:
@@ -274,7 +275,7 @@ def apply_mct(circuit, controls, target, anc, mode='clean-ancilla'):
 def _mct(self, controls, target, ancilla, mode):
     if controls is None or len(controls) < 0:
         raise ValueError('you should pass controls as list or registers')
-    if target is None or len(target) != 1:
+    if target is None or (not isinstance(target, Qubit) and len(target) != 1):
         raise ValueError('target length is not 1')
     if ancilla is None or len(ancilla) < ceil((len(controls)-2)/2):
         raise ValueError('for {} controls, need at least {} ancilla'.format(len(controls), ceil((len(controls)-2)/2)))
